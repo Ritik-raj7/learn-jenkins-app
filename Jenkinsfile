@@ -55,6 +55,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    echo 'testing'
                     npm install netlify-cli@20.1.1
                     node_modules/.bin/netlify --version
                     echo 'Deplaoying to production . Site Id: $NETLIFY_SITE_ID'
