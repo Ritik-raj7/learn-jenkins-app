@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    environment {
+        JFROG_URL = 'http://20.211.80.129:8082/artifactory'
+        JFROG_USER = 'admin1'
+        JFROG_PASSWORD = 'Jfrog@123'
+        JFROG_SERVER_ID = 'my-server'
+    }
+
+    stages {
+        stage('Download JFrog CLI') {
+            steps {
+                sh '''
+                    curl -fL https://releases.jfrog.io/artifactory/jfrog-cli/v2/2.58.1/jfrog-cli-linux-amd64/jfrog -o jfrog
+                    chmod +x jfrog
+                '''
+            }
+        }
+
+        stage('Configure JFrog CLI') {
+            steps {
+                sh '''
+                    ./jfrog rt c ${JFROG_SERVER_ID} \
+                      --url=${JFROG_URL} \
+                      --user=${JFROG_USER} \
+                      --password=${JFROG_PASSWORD} \
+                      --interactive=false
+                '''
+            }
+        }
+
+        stage('Download Artifacts') {
+            steps {
+                sh './jfrog rt dl "example-repo-local/react-app/(*)" "./downloaded/{1}" --server-id=${JFROG_SERVER_ID}'
+            }
+        }
+
+        stage('List Downloaded Files') {
+            steps {
+                sh '''
+                    echo "Downloaded files:"
+                    ls -R downloaded
+                '''
+            }
+        }
+    }
+}
