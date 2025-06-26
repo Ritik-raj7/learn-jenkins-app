@@ -9,10 +9,10 @@ pipeline {
     }
 
     stages {
-        stage('Download JFrog CLI') {
+        stage('Download JFrog CLI v1') {
             steps {
                 sh '''
-                    curl -fL https://releases.jfrog.io/artifactory/jfrog-cli/v2/2.58.1/jfrog-cli-linux-amd64/jfrog -o jfrog
+                    curl -fL https://getcli.jfrog.io | sh
                     chmod +x jfrog
                 '''
             }
@@ -21,7 +21,7 @@ pipeline {
         stage('Configure JFrog CLI') {
             steps {
                 sh '''
-                    JFROG_CLI_BASIC_AUTH_ONLY=true ./jfrog config add ${JFROG_SERVER_ID} \
+                    ./jfrog rt c ${JFROG_SERVER_ID} \
                       --url=${JFROG_URL} \
                       --user=${JFROG_USER} \
                       --password=${JFROG_PASSWORD} \
@@ -34,7 +34,7 @@ pipeline {
             steps {
                 sh '''
                     mkdir -p downloaded
-                    ./jfrog rt download "example-repo-local/react-app/(*)" "downloaded/{1}" \
+                    ./jfrog rt dl "example-repo-local/react-app/(*)" "downloaded/{1}" \
                       --server-id=${JFROG_SERVER_ID}
                 '''
             }
