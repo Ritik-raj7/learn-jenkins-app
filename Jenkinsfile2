@@ -21,8 +21,7 @@ pipeline {
         stage('Configure JFrog CLI') {
             steps {
                 sh '''
-                    export JFROG_CLI_BASIC_AUTH_ONLY=true
-                    ./jfrog config add ${JFROG_SERVER_ID} \
+                    JFROG_CLI_BASIC_AUTH_ONLY=true ./jfrog config add ${JFROG_SERVER_ID} \
                       --url=${JFROG_URL} \
                       --user=${JFROG_USER} \
                       --password=${JFROG_PASSWORD} \
