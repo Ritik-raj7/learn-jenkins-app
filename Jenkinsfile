@@ -167,8 +167,6 @@ pipeline {
 
                     echo "Building React app..."
                     npm run build
-
-                    echo "Build output:"
                     ls -la build
                 '''
             }
@@ -192,22 +190,17 @@ pipeline {
         stage('Upload to Artifactory') {
             steps {
                 sh '''
-                    echo "Downloading JFrog CLI binary manually..."
-                    curl -fL https://releases.jfrog.io/artifactory/jfrog-cli/v2/2.58.1/jfrog-cli-linux-amd64/jfrog \
-                      -o jfrog
+                    echo "Downloading JFrog CLI..."
+                    curl -fL https://releases.jfrog.io/artifactory/jfrog-cli/v2/2.58.1/jfrog-cli-linux-amd64/jfrog -o jfrog
 
                     chmod +x jfrog
                     ./jfrog --version
 
-                    echo "Configuring JFrog CLI..."
-                    ./jfrog rt c my-server \
+                    echo "Uploading build/ to Artifactory..."
+                    ./jfrog rt u "build/**" "$ARTIFACTORY_REPO/$ARTIFACTORY_TARGET" \
                         --url=$ARTIFACTORY_URL \
                         --user=$ARTIFACTORY_USER \
-                        --password=$ARTIFACTORY_PASSWORD \
-                        --interactive=false
-
-                    echo "Uploading build/ to Artifactory..."
-                    ./jfrog rt u "build/**" "$ARTIFACTORY_REPO/$ARTIFACTORY_TARGET" --server-id=my-server
+                        --password=$ARTIFACTORY_PASSWORD
 
                     echo "Cleaning up JFrog binary..."
                     rm -f jfrog
