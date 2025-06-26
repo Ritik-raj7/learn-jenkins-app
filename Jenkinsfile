@@ -67,6 +67,86 @@
 //     }
     
 // }
+// pipeline {
+//     agent any
+
+//     environment {
+//         ARTIFACTORY_URL = 'http://20.211.80.129:8082/artifactory'
+//         ARTIFACTORY_REPO = 'example-repo-local'
+//         ARTIFACTORY_TARGET = 'react-app/'
+//         ARTIFACTORY_USER = 'admin1'
+//         ARTIFACTORY_PASSWORD = 'Jfrog@123'
+//     }
+
+//     stages {
+//         stage('Build') {
+//             agent {
+//                 docker {
+//                     image 'node:18-alpine'
+//                     reuseNode true
+//                 }
+//             }
+//             steps {
+//                 sh '''
+//                     echo "Installing dependencies..."
+//                     npm ci
+
+//                     echo "Building React app..."
+//                     npm run build
+
+//                     echo "Listing build output..."
+//                     ls -la build
+//                 '''
+//             }
+//         }
+
+//         stage('Test') {
+//             agent {
+//                 docker {
+//                     image 'node:18-alpine'
+//                     reuseNode true
+//                 }
+//             }
+//             steps {
+//                 sh '''
+//                     echo "Running tests..."
+//                     test -f build/index.html
+//                     npm test
+//                 '''
+//             }
+//             post {
+//                 always {
+//                     junit 'test-results/junit.xml'
+//                 }
+//             }
+//         }
+
+//         stage('Upload to Artifactory') {
+//             agent {
+//                 docker {
+//                     image 'node:18-alpine'
+//                     reuseNode true
+//                 }
+//             }
+//             steps {
+//                 sh '''
+//                     echo "Installing JFrog CLI..."
+//                     npm install -g jfrog-cli
+
+//                     echo "Configuring JFrog CLI..."
+//                     jfrog rt c my-server \
+//                         --url=$ARTIFACTORY_URL \
+//                         --user=$ARTIFACTORY_USER \
+//                         --password=$ARTIFACTORY_PASSWORD \
+//                         --interactive=false
+
+//                     echo "Uploading build folder to Artifactory..."
+//                     jfrog rt u "build/**" "$ARTIFACTORY_REPO/$ARTIFACTORY_TARGET" --server-id=my-server
+//                 '''
+//             }
+//         }
+//     }
+// }
 pipeline {
     agent any
 
@@ -80,12 +160,6 @@ pipeline {
 
     stages {
         stage('Build') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
             steps {
                 sh '''
                     echo "Installing dependencies..."
@@ -101,12 +175,6 @@ pipeline {
         }
 
         stage('Test') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
             steps {
                 sh '''
                     echo "Running tests..."
@@ -122,12 +190,6 @@ pipeline {
         }
 
         stage('Upload to Artifactory') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
             steps {
                 sh '''
                     echo "Installing JFrog CLI..."
@@ -140,7 +202,7 @@ pipeline {
                         --password=$ARTIFACTORY_PASSWORD \
                         --interactive=false
 
-                    echo "Uploading build folder to Artifactory..."
+                    echo "Uploading to Artifactory..."
                     jfrog rt u "build/**" "$ARTIFACTORY_REPO/$ARTIFACTORY_TARGET" --server-id=my-server
                 '''
             }
