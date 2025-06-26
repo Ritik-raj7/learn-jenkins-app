@@ -167,8 +167,6 @@ pipeline {
 
                     echo "Building React app..."
                     npm run build
-
-                    echo "Listing build output..."
                     ls -la build
                 '''
             }
@@ -193,7 +191,8 @@ pipeline {
             steps {
                 sh '''
                     echo "Installing JFrog CLI..."
-                    npm install -g jfrog-cli
+                    curl -fL https://install-cli.jfrog.io | sh
+                    sudo mv jfrog /usr/local/bin/
 
                     echo "Configuring JFrog CLI..."
                     jfrog rt c my-server \
@@ -209,3 +208,4 @@ pipeline {
         }
     }
 }
+
