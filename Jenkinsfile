@@ -193,8 +193,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Downloading JFrog CLI locally..."
-                    curl -fL https://releases.jfrog.io/artifactory/jfrog-cli/v2/[RELEASE]/jfrog-cli-linux-amd64/jf \
-                      -o jfrog
+                    curl -fL https://install-cli.jfrog.io | sh
 
                     chmod +x jfrog
                     ./jfrog --version
@@ -208,6 +207,9 @@ pipeline {
 
                     echo "Uploading build/ to Artifactory..."
                     ./jfrog rt u "build/**" "$ARTIFACTORY_REPO/$ARTIFACTORY_TARGET" --server-id=my-server
+
+                    echo "Cleaning up CLI binary..."
+                    rm -f jfrog
                 '''
             }
         }
